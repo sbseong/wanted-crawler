@@ -39,10 +39,10 @@ else:
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-err_log_path = program_directory + "\Job_Error_log.txt"
+err_log_path = program_directory + "/Job_Error_log.txt"
 save_date = datetime.today().strftime("%Y%m%d_%H%M")
-exl_name = program_directory + f"\job_{save_date}.xlsx"
-exl_sample_name = program_directory + f"\job_crawling_sample.xlsx"
+exl_name = program_directory + f"/job_{save_date}.xlsx"
+exl_sample_name = program_directory + f"/job_crawling_sample.xlsx"
 
 
 
@@ -111,8 +111,8 @@ while True:
                 link_num += 1
                 gonggo_num += 1
 
-                pyautogui.hotkey('ctrl', 't') # 윈도우용
-                # pyautogui.hotkey("command", "t") # 맥용
+                # pyautogui.hotkey('ctrl', 't') # 윈도우용
+                pyautogui.hotkey("command", "t") # 맥용
                 time.sleep(2)  
                 all_windows = driver.window_handles
                 driver.switch_to.window(all_windows[1])
