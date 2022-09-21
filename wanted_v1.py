@@ -1,3 +1,5 @@
+link_num = int(input("몇번째 채용공고부터 시작할지 숫자로 입력해주세요.(예> 200) >>>"))
+
 import os
 import time
 import requests
@@ -42,6 +44,9 @@ save_date = datetime.today().strftime("%Y%m%d_%H%M")
 exl_name = program_directory + f"/job_{save_date}.xlsx"
 exl_sample_name = program_directory + f"/job_crawling_sample.xlsx"
 
+
+
+
 # 브라우저 꺼짐 방지
 chrome_options = Options()
 chrome_options.add_experimental_option("detach", True)
@@ -72,25 +77,18 @@ ws = wb.active
 
 
 
+gonggo_num = 1
 
 # 메인 페이지 이동
-# sub-category : 
-    # 파이썬개발자 : selected=899         #1 #3
-    # 데이터엔지니어 : selected=655        #1
-    # 빅데이터엔지니어 : selected=1025      #1
-    # 머신러닝엔지니어 :selected=1634       #2 #3
-    # 데이터사이언티스트 : selected=1024     #2 #3
-    # 영상음성엔지니어 : selected=896       #2
 wait = WebDriverWait(driver, 5)
 url = "https://www.wanted.co.kr/wdlist/518?country=kr&job_sort=company.response_rate_order&years=0&years=2&selected=655&selected=899&selected=1025&locations=all" #1
-# url = "https://www.wanted.co.kr/wdlist/518?country=kr&job_sort=company.response_rate_order&years=0&years=2&selected=1634&selected=1024&selected=896&locations=all" #2
-# url = "https://www.wanted.co.kr/wdlist/518?country=kr&job_sort=company.response_rate_order&years=0&years=2&selected=899&selected=1634&selected=1024&locations=all" #3
 driver.get(url=url)
 time.sleep(5)
 
 
 
-link_num = 1
+
+# link_num = 1
 exl_num = 1
 
 
@@ -101,141 +99,148 @@ while True:
 
     for id in ids :
 
+        if gonggo_num < link_num :
+            gonggo_num += 1
 
-        try :
-            link = ids[link_num-1].find_element(By.CSS_SELECTOR, f"#__next > div.JobList_cn__t_THp > div > div > div.List_List_container__JnQMS > ul > li:nth-child({link_num}) > div > a").get_attribute('href')
-            co_name = ids[link_num-1].find_element(By.CSS_SELECTOR, f"#__next > div.JobList_cn__t_THp > div > div > div.List_List_container__JnQMS > ul > li:nth-child({link_num}) > div > a > div > div.job-card-company-name").text
-            print(f"{link_num} : {co_name}")
-            time.sleep(1)
-            link_num += 1
-
-            # pyautogui.hotkey('ctrl', 't') # 윈도우용
-            pyautogui.hotkey("command", "t") # 맥용
-            time.sleep(2)  
-            all_windows = driver.window_handles
-            driver.switch_to.window(all_windows[1])
-            
-            driver.get(link)
-            time.sleep(3)
-
-
-            # 무한 스크롤
-            while True:
-
-                driver.find_element(By.CSS_SELECTOR, "body").send_keys(Keys.END)
-
-
-                try : 
-                    locate2 = driver.find_element(By.CSS_SELECTOR, "#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobWorkPlace_className__ra6rp > div:nth-child(2) > span.header").text
-                    time.sleep(1)
-                    break
-                except :
-                    time.sleep(1)
-                    pass
-
-            # 항목별 데이터 수집            
-
+        if gonggo_num >= link_num :
             try :
-                jikgun = driver.find_element(By.CSS_SELECTOR, "#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > section.JobHeader_className__HttDA > h2").text
-            except:
-                jikgun = ""
+                link = ids[link_num-1].find_element(By.CSS_SELECTOR, f"#__next > div.JobList_cn__t_THp > div > div > div.List_List_container__JnQMS > ul > li:nth-child({link_num}) > div > a").get_attribute('href')
+                co_name = ids[link_num-1].find_element(By.CSS_SELECTOR, f"#__next > div.JobList_cn__t_THp > div > div > div.List_List_container__JnQMS > ul > li:nth-child({link_num}) > div > a > div > div.job-card-company-name").text
+                print(f"{link_num} : {co_name}")
+                time.sleep(1)
+                link_num += 1
+                gonggo_num += 1
+
+                # pyautogui.hotkey('ctrl', 't') # 윈도우용
+                pyautogui.hotkey("command", "t") # 맥용
+                time.sleep(2)  
+                all_windows = driver.window_handles
+                driver.switch_to.window(all_windows[1])
+                
+                driver.get(link)
+                time.sleep(3)
 
 
-            try :
-                closing_date = driver.find_element(By.CSS_SELECTOR, "#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobWorkPlace_className__ra6rp > div:nth-child(1) > span.body").text
-            except:
-                closing_date = ""
+                # 무한 스크롤
+                while True:
 
-            try :
-                locate = driver.find_element(By.CSS_SELECTOR, "#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobWorkPlace_className__ra6rp > div:nth-child(2) > span.body").text
-            except:
-                locate = ""
+                    driver.find_element(By.CSS_SELECTOR, "body").send_keys(Keys.END)
 
 
-            jikmu = ""
-            upmu = ""
-            jakyuk = ""
-            woodea = ""
-            bokri = ""
+                    try : 
+                        locate2 = driver.find_element(By.CSS_SELECTOR, "#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobWorkPlace_className__ra6rp > div:nth-child(2) > span.header").text
+                        time.sleep(1)
 
-            i = 1
+                        break
+                    except :
+                        time.sleep(1)
+                        pass
 
-            while i < 11 :
+                # 항목별 데이터 수집            
+
                 try :
-                    el_name = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > h6:nth-child({i})").text
-
-                    if el_name == "주요업무" :
-
-                        upmu2 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1})").text
-                        upmu = str(upmu2).replace('-','•').replace('ㆍ','•').replace('■','•').replace('●','•').replace('◈','•')
-
-                    if el_name == "자격요건" :
-
-                        jakyuk2 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1})").text
-                        jakyuk = str(jakyuk2).replace('-','•').replace('ㆍ','•').replace('■','•').replace('●','•').replace('◈','•')
-        
-                    if el_name == "우대사항" :
-
-                        woodea2 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1})").text
-                        woodea = str(woodea2).replace('-','•').replace('ㆍ','•').replace('■','•').replace('●','•').replace('◈','•')
-
-                    if el_name == "혜택 및 복지" :
-
-                        bokri2 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1})").text
-                        bokri = str(bokri2).replace('-','•').replace('ㆍ','•').replace('■','•').replace('●','•').replace('◈','•')
-
-                    if el_name == "기술스택 ・ 툴" :
-                        try :
-                            jikmu2_1 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1}) > div > div:nth-child(1)").text
-                        except :
-                            jikmu2_1 = ""
-                        try :
-                            jikmu2_2 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1}) > div > div:nth-child(2)").text
-                        except :
-                            jikmu2_2 = ""
-                        try :
-                            jikmu2_3 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1}) > div > div:nth-child(3)").text
-                        except :
-                            jikmu2_3 = ""
-
-                        jikmu2 = jikmu2_1 + " " + jikmu2_2 + " " + jikmu2_3
-                        jikmu = str(jikmu2).replace('-','•').replace('ㆍ','•').replace('■','•').replace('●','•').replace('◈','•')
-                    i += 1
-
-                except :
-                    i += 1
-                    pass
-
-            # 엑셀 저장
-
-            ws[f'A{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',jikgun))
-            ws[f'B{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',co_name))
-            ws[f'C{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',jikmu))
-            ws[f'D{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',upmu))
-            ws[f'E{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',jakyuk))
-            ws[f'F{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',woodea))
-            ws[f'G{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',bokri))
-            ws[f'H{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',closing_date))
-            ws[f'I{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',locate))
-            # ws[f'J{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',contact))
-            ws[f'K{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',link))
-
-            wb.save(exl_name)
-            print("저장완료")
-            exl_num += 1
-            time.sleep(1)
+                    jikgun = driver.find_element(By.CSS_SELECTOR, "#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > section.JobHeader_className__HttDA > h2").text
+                except:
+                    jikgun = ""
 
 
+                try :
+                    closing_date = driver.find_element(By.CSS_SELECTOR, "#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobWorkPlace_className__ra6rp > div:nth-child(1) > span.body").text
+                except:
+                    closing_date = ""
 
-            driver.close()
-            driver.switch_to.window(all_windows[0])
+                try :
+                    locate = driver.find_element(By.CSS_SELECTOR, "#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobWorkPlace_className__ra6rp > div:nth-child(2) > span.body").text
+                except:
+                    locate = ""
 
-        except :
-            break
+
+                jikmu = ""
+                upmu = ""
+                jakyuk = ""
+                woodea = ""
+                bokri = ""
+                skill = ""
+
+                i = 1
+
+                while i < 11 :
+                    try :
+                        el_name = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > h6:nth-child({i})").text
+
+                        if el_name == "주요업무" :
+
+                            upmu2 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1})").text
+                            upmu = str(upmu2).replace('-','•').replace('ㆍ','•').replace('■','•').replace('●','•').replace('◈','•')
+
+                        if el_name == "자격요건" :
+
+                            jakyuk2 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1})").text
+                            jakyuk = str(jakyuk2).replace('-','•').replace('ㆍ','•').replace('■','•').replace('●','•').replace('◈','•')
+            
+                        if el_name == "우대사항" :
+
+                            woodea2 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1})").text
+                            woodea = str(woodea2).replace('-','•').replace('ㆍ','•').replace('■','•').replace('●','•').replace('◈','•')
+
+                        if el_name == "혜택 및 복지" :
+
+                            bokri2 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1})").text
+                            bokri = str(bokri2).replace('-','•').replace('ㆍ','•').replace('■','•').replace('●','•').replace('◈','•')
+
+                        if el_name == "기술스택 ・ 툴" :
+                            try :
+                                jikmu2_1 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1}) > div > div:nth-child(1)").text
+                            except :
+                                jikmu2_1 = ""
+                            try :
+                                jikmu2_2 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1}) > div > div:nth-child(2)").text
+                            except :
+                                jikmu2_2 = ""
+                            try :
+                                jikmu2_3 = driver.find_element(By.CSS_SELECTOR, f"#__next > div.JobDetail_cn__WezJh > div.JobDetail_contentWrapper__DQDB6 > div.JobDetail_relativeWrapper__F9DT5 > div.JobContent_className___ca57 > div.JobContent_descriptionWrapper__SM4UD > section.JobDescription_JobDescription__VWfcb > p:nth-child({i+1}) > div > div:nth-child(3)").text
+                            except :
+                                jikmu2_3 = ""
+
+                            skill = jikmu2_1 + " " + jikmu2_2 + " " + jikmu2_3
+
+                        i += 1
+
+                    except :
+                        i += 1
+                        pass
+                      
+                # 엑셀 저장
+
+                ws[f'A{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',jikgun))
+                ws[f'B{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',co_name))
+                # ws[f'C{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',jikmu))
+                ws[f'D{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',upmu))
+                ws[f'E{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',jakyuk))
+                ws[f'F{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',woodea))
+                ws[f'G{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',bokri))
+                ws[f'H{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',closing_date))
+                ws[f'I{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',locate))
+                # ws[f'J{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',contact))
+                ws[f'K{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',link))
+                ws[f'L{exl_num+1}'] = str(ILLEGAL_CHARACTERS_RE.sub(r'',skill))
+
+                wb.save(exl_name)
+                print("저장완료")
+                exl_num += 1
+                time.sleep(1)
+
+
+
+                driver.close()
+                driver.switch_to.window(all_windows[0])
+
+            except :
+                break
     
     time.sleep(1)
     driver.find_element(By.CSS_SELECTOR, "body").send_keys(Keys.END)
-    time.sleep(5)
+    time.sleep(3)
 
 
 
